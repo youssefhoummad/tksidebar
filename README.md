@@ -3,7 +3,9 @@ tkinter widgte to add a sidebare to your apps.
 
 ## How to use
 is simple
-`import tkinter as tk
+
+`
+import tkinter as tk
 from tk_sidebare import Sidebare
 
 root = tk.Tk()
@@ -13,7 +15,8 @@ sidebare.add_button("path to icon1", "some string", command1)
 sidebare.add_button("path to icon2", "some string", command2)
 sidebare.add_button("path to icon3", "another string", command2, at_bottom=True)
 
-root.mainloop()`
+root.mainloop()
+`
 
 
 ## notice
@@ -24,4 +27,4 @@ you can add options to sidebare
 the color must be in hex 
 
 you can also add header to sidebare
-`sidebare.add_header(widget)
+`sidebare.add_header(widget)`
