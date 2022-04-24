@@ -4,7 +4,7 @@ tkinter widgte to add a sidebare to your apps.
 ## How to use
 is simple
 
-`
+```
 import tkinter as tk
 from tk_sidebare import Sidebare
 
@@ -16,7 +16,7 @@ sidebare.add_button("path to icon2", "some string", command2)
 sidebare.add_button("path to icon3", "another string", command2, at_bottom=True)
 
 root.mainloop()
-`
+```
 
 
 ## notice
