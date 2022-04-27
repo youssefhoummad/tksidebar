@@ -6,6 +6,10 @@ tkinter widgte to add a sidebare to your apps.
 `pip install tk_sidebare`
 
 
+## Screenshot
+![screenshot(https://github.com/youssefhoummad/tk_sidebare/blob/main/img/screenshot.jpg?raw=true)]
+
+
 ## How to use
 is simple
 
@@ -29,7 +33,5 @@ you can add options to sidebare
 
 `sidebare = Sidebare(root, bg='#EFF4F8', bg_hover='green', bg_press='yellow', accent_color='purple')`
 
-the background color `bg` must be in hex 
-
-you can also add header to sidebare
+you can also add header to sidebare but added before buttons.
 `sidebare.add_header(widget)`
