@@ -7,7 +7,7 @@ tkinter widgte to add a sidebare to your apps.
 
 
 ## Screenshot
-![screenshot(https://github.com/youssefhoummad/tk_sidebare/blob/main/img/screenshot.jpg?raw=true)]
+![screenshot](https://github.com/youssefhoummad/tk_sidebare/blob/main/img/screenshot.jpg?raw=true)
 
 
 ## How to use
