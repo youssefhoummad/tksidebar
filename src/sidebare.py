@@ -1,8 +1,15 @@
 from tkinter import Frame, Label, PhotoImage
-from .utils import getAccentColor, color_variant, isLightOrDark
+from tkinter import ttk
+# from tkinter import ttk
+from .utils import getAccentColor #, color_variant, isLightOrDark
 
+# ACCENT_COLOR = "#0067C0"
 BG = '#EFF4F8'
+# BG_HOVER = '#E8EBF0'
+# BG_PRESS = '#D6D9DE'
 
+# JUSTIFY = 'left'
+# PADDING = ()
 
 
 class Sidebar(Frame):
@@ -14,11 +21,12 @@ class Sidebar(Frame):
 
         self.accent_color = accent_color or getAccentColor()
         self.bg = bg or '#EFF4F8'
-        self.bg_hover = bg_hover
-        self.bg_press = bg_press
+        self.bg_hover = bg_hover or '#E8EBF0'
+        self.bg_press = bg_press or '#D6D9DE'
 
-        if not self.bg.startswith("#"): 
-          raise Exception("Background color for sidebare must be in hex!")
+
+        # if not self.bg.startswith("#"): 
+          # raise Exception("Background color for sidebare must be in hex!")
 
         self.config(bg=self.bg)
         super().config(**kwargs)
@@ -41,20 +49,20 @@ class Sidebar(Frame):
         self.bg_hover = kwargs.get('bg_hover')
       if 'bg_press' in kwargs:
         self.bg_press = kwargs.get('bg_press')
-      if not ('bg_hover' and 'bg_press') in kwargs:
-        self.set_colors()
+      # if not ('bg_hover' and 'bg_press') in kwargs:
+      #   self.set_colors()
       
       super().config(**kwargs)
       
     configure = config
 
-    def set_colors(self):
-      if isLightOrDark(self.bg) == 'light':
-        self.bg_hover = color_variant(self.bg, -10)
-        self.bg_press = color_variant(self.bg, -30)
-      else:
-        self.bg_hover = color_variant(self.bg, 10)
-        self.bg_press = color_variant(self.bg, 30)
+    # def set_colors(self):
+    #   if isLightOrDark(self.bg) == 'light':
+    #     self.bg_hover = color_variant(self.bg, -10)
+    #     self.bg_press = color_variant(self.bg, -30)
+    #   else:
+    #     self.bg_hover = color_variant(self.bg, 10)
+    #     self.bg_press = color_variant(self.bg, 30)
       
 
     def add_header(self, widget):
@@ -83,12 +91,6 @@ class Sidebar(Frame):
 
 
 class SButton(Frame):
-  # ACCENT_COLOR = "#0067C0"
-  # BG = '#EFF4F8'
-  # BG_HOVER = '#E8EBF0'
-  # BG_PRESS = '#D6D9DE'
-
-  JUSTIFY = 'left'
 
   instances=set()
 
@@ -100,9 +102,9 @@ class SButton(Frame):
     **kwargs):
     super().__init__(parent, **kwargs)
     self.ACCENT_COLOR, self.BG, self.BG_HOVER, self.BG_PRESS = accent_color, bg, bg_hover, bg_press
+    self.JUSTIFY = kwargs.get('justify', 'left')
+    
     self.config(bg=self.BG)
-
-    #TODO: Need to implement twiks to change color (bg, accent...)
 
     self.command= command
     self.active = False
@@ -111,7 +113,7 @@ class SButton(Frame):
     self.border = Frame(self, bg=self.BG, width=4, height=18)
     # icon label
     _img = PhotoImage(file=icon)
-    self.icon = Label(self, image=_img)
+    self.icon = Label(self, image=_img, bg=self.BG)
     self.icon.image = _img
     # text label
     self.text = Label(self, text=text, bg=self.BG) #  font=('Segoe UI',10,"normal")
