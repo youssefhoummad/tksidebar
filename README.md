@@ -3,7 +3,7 @@ tkinter widgte to add a sidebare to your apps.
 
 ## How to install
 
-`pip install tk_sidebare`
+`pip install tksidebar`
 
 
 ## Screenshot
@@ -15,14 +15,14 @@ is simple
 
 ```
 import tkinter as tk
-from tk_sidebare import Sidebare
+from tksidebar import Sidebar
 
 root = tk.Tk()
-sidebare = Sidebare(root)
+sidebare = Sidebar(root)
 
-sidebare.add_button("path to icon1.png", "some string", command1)
-sidebare.add_button("path to icon2.png", "some string", command2)
-sidebare.add_button("path to icon3.png", "another string", command2, at_bottom=True)
+sidebar.add_button("path to icon1.png", "some string", command1)
+sidebar.add_button("path to icon2.png", "some string", command2)
+sidebar.add_button("path to icon3.png", "another string", command2, at_bottom=True)
 
 root.mainloop()
 ```
@@ -31,7 +31,7 @@ root.mainloop()
 ## notice
 you can add options to sidebare
 
-`sidebare = Sidebare(root, bg='#EFF4F8', bg_hover='green', bg_press='yellow', accent_color='purple')`
+`sidebar = Sidebar(root, bg='#EFF4F8', bg_hover='green', bg_press='yellow', accent_color='purple')`
 
 you can also add header to sidebare but added before buttons.
-`sidebare.add_header(widget)`
+`sidebar.add_header(widget)`
