@@ -1,0 +1,11 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+src/tksidebar/__init__.py
+src/tksidebar/sidebar.py
+src/tksidebar.egg-info/PKG-INFO
+src/tksidebar.egg-info/SOURCES.txt
+src/tksidebar.egg-info/dependency_links.txt
+src/tksidebar.egg-info/top_level.txt
