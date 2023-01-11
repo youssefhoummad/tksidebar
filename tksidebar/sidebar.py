@@ -1,184 +1,237 @@
-from tkinter import Frame, Label, PhotoImage
+import tkinter as tk
 from tkinter import ttk
 from winreg import *
 
+def get_accent_color():  
 
-class Sidebar(Frame):
-    PADDING = (0, 6)
+  """
+  Return the Windows 10 accent color used by the user in a HEX format
+  """
+  registry = ConnectRegistry(None, HKEY_CURRENT_USER)
+  key = OpenKey(registry, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Accent')
+  key_value = QueryValueEx(key,'AccentColorMenu')
+  accent_int = key_value[0]
+  accent = accent_int-4278190080
+  accent = str(hex(accent)).split('x')[1]
+  accent = accent[4:6]+accent[2:4]+accent[0:2]
+  return '#'+accent
 
-    def __init__(self, master, accent_color=None, bg=None, bg_hover=None, bg_press=None, **kwargs):
-        super().__init__(master)
+default_colors = {"accent": get_accent_color(), "bg":'#EFF4F8',"hover":'#E8EBF0',"press":'#D6D9DE'}
 
 
-        self.accent_color = accent_color or getAccentColor()
-        self.bg = bg or '#EFF4F8'
-        self.bg_hover = bg_hover or '#E8EBF0'
-        self.bg_press = bg_press or '#D6D9DE'
 
-        self.config(bg=self.bg)
-        super().config(**kwargs)
-
-        if not 'width' in kwargs:
-            self.config(width=200)
-
-        self.buttons = list()
-      
+class Sidebook(tk.Frame):
+  _id = 0
+  def __init__(self, master=None, width_sidebar=200, padding=[], colors=default_colors, **kw):
+    # width = kw.pop('width', 200)
+    self.justify = kw.pop('justify', 'left')
+    width = kw.pop('width', 200)
+    super().__init__(master, **kw)
     
 
-    def config(self, **kwargs):
-      if ('bg' or 'background') in kwargs:
-        self.bg = kwargs.get('bg' or 'background')
-        super().config(bg=self.bg)
-      
-      if 'accent_color' in kwargs:
-        self.accent_color = kwargs.get('accent_color')
-      if 'bg_hover' in kwargs:
-        self.bg_hover = kwargs.get('bg_hover')
-      if 'bg_press' in kwargs:
-        self.bg_press = kwargs.get('bg_press')
-      
-      super().config(**kwargs)
-      
-    configure = config
-      
+    left, right = 'left', 'right'
+    if self.justify == 'right':
+      left, right = right, left
 
-    def add_header(self, widget):
-        if self.buttons:
-            raise "The header widget must be the first before other sidebar items"
-        
-        widget.config(bg=self['bg'])
-        widget.pack(fill='x', padx=self.PADDING, pady=self.PADDING)
+    self.colors =  self.set_colors(colors)
 
-    def add_button(self, text, icon_path, command, at_bottom=False):
-        # Create button Sidebar
-        sb = SButton(self, text, icon_path, command, 
-                      accent_color=self.accent_color, 
-                      bg=self.bg, 
-                      bg_hover=self.bg_hover, 
-                      bg_press=self.bg_press
-                    )
+    self.padding = padding
 
-        if not at_bottom:
-            sb.pack(fill='x', padx=self.PADDING, pady=1)
-        else:
-            sb.pack(side='bottom', fill='x', padx=self.PADDING, pady=1)
-        
-        self.buttons.append(sb)
+    self.sidebar = tk.Frame(self, bg=self.colors['bg'], width=width_sidebar)
+    self.mainerea = tk.Frame(self, bg=self['bg'])
+    if width: self.mainerea.config(width=width-width_sidebar)
+    
+
+    self.header = ttk.Frame(self.sidebar)
+    self.header.pack(fill='x')
+
+    self.sidebar.pack(side=left, fill='y')
+    self.sidebar.pack_propagate(False)
+    self.mainerea.pack(side=left, fill='both', expand=True)
+    self.mainerea.pack_propagate(False)
+
+    self.tabs = {}
+
+  
+  def set_colors(self, colors):
+    _colors = default_colors
+    if colors:
+      for key, value in colors.items():
+        if value!='default':
+          _colors[key] = value
+    return _colors
 
 
+  def add(self, widget, text, icon=None, at_bottom=False, **packoptions): 
+    sb = SideTab(self.sidebar, text, colors=self.colors,
+              command=lambda:self.show(widget, **packoptions),
+              icon=icon, 
+              justify=self.justify )
+              # TODO customize padding from class kwargs 
 
-class SButton(Frame):
+    if not at_bottom:
+      sb.pack(fill='x', padx=8, pady=3, anchor='nw')
+    else:
+      sb.pack(side='bottom', fill='x', padx=8, pady=3, anchor='sw')
+    
+    self.tabs[self._id] = sb
+    self._id += 1
 
+
+  def add_header(self, widget, **packoptions): 
+    widget.pack(in_=self.header,  **packoptions)
+
+
+  def show(self, widget, **packoptions):
+    # clean mainerea
+    [w.forget() for w in self.mainerea.pack_slaves()]
+    # pack new frame
+    widget.pack(in_=self.mainerea, **packoptions)
+
+
+  def select(self, _id:int)->None:
+    tab = self.tabs.get(_id)
+    if tab:
+      tab.on_active()
+      tab.on_release()
+  
+
+  def current(self)-> int:
+    for _id, tab in self.tabs.items():
+      if tab.active:
+        return _id
+
+
+  def text(self, _id:int):
+    tab = self.tabs.get(_id)
+    if tab:
+      return tab.text['text']
+
+
+class SideTab(tk.Frame):
   instances=set()
 
-  def __init__(self, parent, text, icon=None, command=None,
-    accent_color = "#0067C0",
-    bg = '#EFF4F8',
-    bg_hover = '#E8EBF0',
-    bg_press = '#D6D9DE',
-    **kwargs):
-    super().__init__(parent, **kwargs)
-    self.ACCENT_COLOR, self.BG, self.BG_HOVER, self.BG_PRESS = accent_color, bg, bg_hover, bg_press
-    self.JUSTIFY = kwargs.get('justify', 'left')
-    
-    self.config(bg=self.BG)
+  def __init__(self, master, text, icon=None, colors=[], command=None, **kw):
+    justify = kw.pop('justify', 'left')
+    super().__init__(master, **kw)
+
+    left, right = 'left', 'right'
+    if justify == 'right':
+      left, right = right, left
+
+    self.config(bg=master['bg'])
 
     self.command= command
+    self.colors = colors
+
     self.active = False
 
-    # edge border for active button
-    self.border = Frame(self, bg=self.BG, width=4, height=18)
-    # icon label
-    _img = PhotoImage(file=icon)
-    self.icon = Label(self, image=_img, bg=self.BG)
-    self.icon.image = _img
-    # text label
-    self.text = Label(self, text=text, bg=self.BG) #  font=('Segoe UI',10,"normal")
+    self.border = tk.Frame(self, bg=self['bg'], width=4, height=20) # height=18
+    self.text = tk.Label(self, text=text, bg=self['bg'])
 
-    # pack border & icon & text
-    self.border.pack(side=self.JUSTIFY, pady=3)
-    self.icon.pack(side=self.JUSTIFY, pady=6, padx=(8,6))
-    self.text.pack(side=self.JUSTIFY)
+    if icon:
+      if isinstance(icon, str):
+        _img = tk.PhotoImage(file=icon)
+        self.icon = tk.Label(self, image=_img, bg=self['bg'])
+        self.icon.image = _img
+      else:
+        self.icon = tk.Label(self, image=icon, bg=self['bg'])
+    else:
+      self.icon = tk.Label(self, text="", bg=self['bg'])
 
+    self.border.pack(side=left, padx=8)
+    self.icon.pack(side=left,)
+    self.text.pack(side=left, fill='x', padx=8)
 
-    self.bind("<ButtonPress-1>", self.on_press)
-    self.bind("<ButtonRelease-1>", self.on_release)
-    self.bind("<Enter>", self.on_hover)
-    self.bind("<Leave>", self.on_leave)
-
-    for w in self.winfo_children():
+    for w in [self, self.border, self.icon, self.text]:
       w.bind("<ButtonPress-1>", self.on_press)
       w.bind("<ButtonRelease-1>", self.on_release)
       w.bind("<Enter>", self.on_hover)
       w.bind("<Leave>", self.on_leave)
-
-
+    
+    self.config(height=36)
+    self.pack_propagate(False)
     type(self).instances.add(self)
-
   
-  def on_hover(self, e):
+
+  def on_hover(self, *args):
     if self.active:
-      self.on_press(None)
+      self.on_press()
     else:
-      self.config(bg=self.BG_HOVER)
-      self.text.config(bg=self.BG_HOVER)
-      self.icon.config(bg=self.BG_HOVER)
+      self.config(bg=self.colors['hover'])
+      self.text.config(bg=self.colors['hover'])
+      self.border.config(bg=self.colors['hover'])
+      self.icon.config(bg=self.colors['hover'])
     self.text.config(fg='black')
     
   
-  def on_press(self, e):
-    self.config(bg=self.BG_PRESS)
-    self.text.config(bg=self.BG_PRESS, fg='gray')
-    self.icon.config(bg=self.BG_PRESS)
-    self.border.config(bg=self.ACCENT_COLOR)
+  def on_press(self, *args):
+    self.config(bg=self.colors['press'])
+    self.text.config(bg=self.colors['press'], fg='gray')
+    self.icon.config(bg=self.colors['press'])
+    self.border.config(bg=self.colors['accent'])
     
 
     for btn in type(self).instances:
-      btn.on_disactive()
+      try:
+        btn.on_disactive()
+      except:
+        pass
     self.on_active()
 
 
-  def on_leave(self, e):
+  def on_leave(self, *args):
     if self.active:
-      self.on_press(None)
+      self.on_press()
     else:
-      self.icon.config(bg=self.BG)
-      self.border.config(bg=self.BG)
-      self.config(bg=self.BG)
-      self.text.config(bg=self.BG)
+      self.icon.config(bg=self.colors['bg'])
+      self.border.config(bg=self.colors['bg'])
+      self.config(bg=self.colors['bg'])
+      self.text.config(bg=self.colors['bg'])
     self.text.config(fg='black')
       
 
-  def on_release(self, e):
-    self.on_hover(e=None)
+  def on_release(self, *args):
+    self.on_hover()
     self.command()
+
 
   def on_active(self):
     self.active = True
-    self.border.config(bg=self.ACCENT_COLOR)
-    self.config(bg=self.BG_PRESS)
-    self.text.config(bg=self.BG_PRESS)
-    self.icon.config(bg=self.BG_PRESS)
+    self.border.config(bg=self.colors['accent'])
+    self.config(bg=self.colors['press'])
+    self.text.config(bg=self.colors['press'])
+    self.icon.config(bg=self.colors['press'])
 
   def on_disactive(self):
     self.active = False
-    self.border.config(bg=self.BG)
-    self.config(bg=self.BG)
-    self.text.config(bg=self.BG)
-    self.icon.config(bg=self.BG)
+    self.border.config(bg=self.colors['bg'])
+    self.config(bg=self.colors['bg'])
+    self.text.config(bg=self.colors['bg'])
+    self.icon.config(bg=self.colors['bg'])
 
 
 
 
-def getAccentColor():  
-    """
-    Return the Windows 10 accent color used by the user in a HEX format
-    """
-    registry = ConnectRegistry(None,HKEY_CURRENT_USER)
-    key = OpenKey(registry, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Accent')
-    key_value = QueryValueEx(key,'AccentColorMenu')
-    accent_int = key_value[0]
-    accent = accent_int-4278190080
-    accent = str(hex(accent)).split('x')[1]
-    accent = accent[4:6]+accent[2:4]+accent[0:2]
-    return '#'+accent
+
+if __name__ == '__main__':
+  root = tk.Tk()
+  root.geometry('600x400')
+
+  sideBook = Sidebook(root, colors={"accent":"red"}, justify='right')
+
+  button = tk.Button(text="clcik")
+  button2 = tk.Button(text="second screen")
+  button3 = tk.Button(text="third screen")
+
+  sideBook.add(button, text="split file", icon=r'images\split.png')
+  sideBook.add(button2, text="merge files", icon=r'images\merge.png')
+  sideBook.add(button2, text="crop margins", icon=r'images\crop.png')
+  sideBook.add(button2, text="rotate pages", icon=r'images\rotation.png')
+  sideBook.add(button2, text="convert to images", icon=r'images\picture.png')
+  sideBook.add(button3, text="settings", icon=r'images\settings.png', at_bottom=True)
+
+  
+  print(sideBook.text(1))
+  sideBook.pack()
+  root.mainloop()
