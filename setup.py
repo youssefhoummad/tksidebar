@@ -4,16 +4,16 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="tk_sidebare",
+    name="tksidebar",
     version="0.3.0",
     author="youssef hoummad",
     author_email="youssefhoummad@outlook.com",
     description="Add nice sidebar to tkinter apps",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/youssefhoummad/tk_sidebare",
+    url="https://github.com/youssefhoummad/tksidebar",
     project_urls={
-        "Bug Tracker": "https://github.com/martinet101/win32mica/issues",
+        "Bug Tracker": "https://github.com/youssefhoummad/tksidebar/issues",
     },
     classifiers=[
           'Intended Audience :: Developers',
