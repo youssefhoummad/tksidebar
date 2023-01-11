@@ -51,8 +51,11 @@ window.mainloop()
 
 ## notice
 you can change sidebare colors:
+
+```
 my_colors = {"accent": 'default', "bg":'#EFF4F8',"hover":'#E8EBF0',"press":'#D6D9DE'}
-`sidebar = Sidebar(window,colors=my_colors)`
+sidebar = Sidebar(window,colors=my_colors)
+```
 
 you can also specific sidebar width
 `sidebar = Sidebar(window,sidebar_width=260)`
