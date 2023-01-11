@@ -54,11 +54,11 @@ you can change sidebare colors:
 
 ```
 my_colors = {"accent": 'default', "bg":'#EFF4F8',"hover":'#E8EBF0',"press":'#D6D9DE'}
-sidebar = Sidebar(window,colors=my_colors)
+sidebook = Sidebook(window,colors=my_colors)
 ```
 
 you can also specific sidebar width
-`sidebar = Sidebar(window,sidebar_width=260)`
+`sidebook = Sidebook(window,sidebar_width=260)`
 
 you can also add header to sidebar.
-`sidebar.add_header(widget, padx=10)`
+`sidebook.add_header(widget, padx=10)`
