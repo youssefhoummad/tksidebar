@@ -1,4 +1,4 @@
-# tk_sidebare
+# tksidebare
 tkinter widgte to add a sidebare to your apps.
 
 ## How to install
