@@ -5,10 +5,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="tk_sidebare",
-    version="0.1",
+    version="0.3.0",
     author="youssef hoummad",
     author_email="youssefhoummad@outlook.com",
-    description="Add nice sidebare to tkinter apps",
+    description="Add nice sidebar to tkinter apps",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/youssefhoummad/tk_sidebare",
