@@ -62,3 +62,7 @@ you can also specific sidebar width
 
 you can also add header to sidebar.
 `sidebook.add_header(widget, padx=10)`
+
+
+you can also add sidebar without icons.
+`sidebook.add(Frame, text="home", icon="")`
