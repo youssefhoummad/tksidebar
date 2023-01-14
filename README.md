@@ -43,7 +43,7 @@ for name, frame, icon, bottom in tabs:
   sidebook.add(frame, text=name, icon=icon, at_bottom=bottom) # add here any options for pack (fill, expand, padx...)
 sidebook.select(0)
 
-sidebook.pack(anchor='nw', fill='both', expand=True)
+sidebook.pack(anchor='nw', fill='both', expand=True) # important !!! fill='both', expand=True
 
 window.mainloop()
 ```
