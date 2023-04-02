@@ -158,6 +158,7 @@ class SideTab(tk.Frame):
     self.icon.pack(side=left,)
     self.text.pack(side=left, fill='x', padx=8)
 
+    # use self.bind_all better!
     for w in [self, self.border, self.icon, self.text]:
       w.bind("<ButtonPress-1>", self.on_press)
       w.bind("<ButtonRelease-1>", self.on_release)
